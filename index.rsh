@@ -1,74 +1,46 @@
 'reach 0.1'
 
+const Drugs = Object({
+  price: UInt,
+  drugToken: Token,
+})
+
 export const main = Reach.App(() => {
-  // Distributor => Quantity = 10
-  const Distributor = Participant('Distributor', {
-    getSale: Fun([], Object({
-      nftId: Token,
-      drugPrice: UInt,   // Assume this is price
-      lenInBlocks: UInt,
-    })),
-    saleReady: Fun([], Null),
-    seePurchase: Fun([Address, UInt], Null),
-    showOutcome: Fun([Address, UInt], Null),
-  });
-
-  // Pharmacy
-  const Pharmacy = API('Pharmacy', {
-    purchase: Fun([UInt], Tuple(Address, UInt)) //  Purchase Quantity = 5, TxHash => Purchase 5 Proof
+  const Distributor = Participant('Distributor' ,{
+    drugs: Drugs,
+    launched: Fun([Contract], Null),
   })
+  const Pharmacy = API('Pharmacy', {
+    purchase: Fun([UInt], Null),
+  })
+  init()
 
-  init();
-
-  // Local Step
   Distributor.only(() => {
-    const { nftId, drugPrice, lenInBlocks} = declassify(interact.getSale());
-  });
-
-  // Sign Transaction
-  Distributor.publish(nftId, drugPrice, lenInBlocks);
-
-  const quantity = 10;
-  commit();
-  Distributor.pay([[quantity, nftId]]);
-
-  // Tells frontend that auction is ready
-  Distributor.interact.saleReady();
-
-  // assert(balance(nftId) == quantity, "The balance of NFT is wrong");
-
-  // we dont care about time
-  // const end = lastConsensusTime() + lenInBlocks;
-
-  const 
-    lastQuantity
-   = parallelReduce(quantity)
-    //.invariant(balance(nftId) > 0) // remove this instead
-    .invariant(balance() == ((quantity - balance(nftId)) * drugPrice)) // (Total Quantity - balance(nftId)) * drugPrice (Total Sales)
-    .while(balance(nftId) > 0)
-    .api_(Pharmacy.purchase, (purchase) => {
-      check(purchase < lastQuantity, 'too many bro'); // if it does not satisfy, then output
-      return [ purchase, (notify) => {
-        notify([this, lastQuantity]);
-
-
-        const who = this;
-        Distributor.interact.seePurchase(who, purchase);
-        transfer(purchase, nftId).to(this); // Transfer the quantity to buyer
-        
-        return purchase; 
-      }];
+    const drugs = declassify(interact.drugs)
+  })
+  Distributor.publish(drugs)
+  const { price, drugToken } = drugs
+  commit()
+  //Distributor.pay([[10, drugToken]])                    // Error 1 here
+  Distributor.interact.launched(getContract())
+  //assert(balance(drugToken) == 10, 'balance is wrong')  // Error 2 here
+  Distributor.publish()
+  //const Pharmacys = new Map(Address, Bool)              // track Pharmacy visited by saving their address
+  
+  const [ numSold, numCust ] = parallelReduce([0, 0])     // 0 sold and 0 Pharmacy at the beginning
+    .invariant(balance() == numSold * price)
+    .while(numSold < 10)
+    .api_(Pharmacy.purchase, (numBuy) => {                // numBuy = number of drugs that the Pharmacy wants to buy
+      //check(isNone(Pharmacys[this]), "already registered")
+      check(numBuy < numSold, 'too many')    
+      return[price * numBuy, (ret) => {                   // Pharmacy will pay here
+        //Pharmacys[this] = true                          // Save the address of Pharmacy
+        //transfer(numBuy, drugToken).to(this)            // Error 3 here
+        ret(null)
+        return [ numSold+numBuy, numCust+1 ]              // Update number of drugs sold, Update number of Pharmacy visited
+      }]
     })
-    // .timeout(absoluteTime(end), () => {
-    //   Creator.publish();
-    //   return [highestBidder, lastPrice, isFirstBid];
-    // });
-
-    transfer(balance()).to(Distributor); // smart contract => address
-    
-    // Distributor.interact.showOutcome(highestBidder, lastPrice);
-
-
-    commit();
-    exit();
+  transfer(balance()).to(Distributor)                     // Transfer Money to Distributor
+  commit()
+  exit()
 })
