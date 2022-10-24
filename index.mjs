@@ -4,77 +4,80 @@ import * as backend from './build/index.main.mjs';
 const stdlib = loadStdlib();
 const startingBalance = stdlib.parseCurrency(100);
 
-console.log('Creating Account for Creator');
+console.log('Creating Account for Distributor');
 
-const accCreator = await stdlib.newTestAccount(startingBalance);
+const accDistributor = await stdlib.newTestAccount(startingBalance);
 
-console.log('Having creator create testing NFT');
+console.log('Having distributor create drug token');
 
-const theNFT = await stdlib.launchToken(accCreator, "bumple", "NFT", { supply: 10});
-const nftId = theNFT.id;
-const minBid = stdlib.parseCurrency(2);  // 2 ALGO
-const lenInBlocks = 10;
-const params = { nftId, minBid, lenInBlocks };
+const drugToken = await stdlib.launchToken(accDistributor, "panadol", "PND", { supply: 10});
+const drugTokenId = drugToken.id;
+const drugPrice = stdlib.parseCurrency(10);  // 2 ALGO
+// const purchaseQuantity = 0;
+// const lenInBlocks = 10;
+const params = { drugToken: drugTokenId, price: drugPrice};
 
 let done = false;
-const bidders = [];
-const startBidders = async() => {
-  let bid = minBid;
-  const runBidder = async (who) => {
-    const inc = stdlib.parseCurrency(Math.random() * 10);
-    bid = bid.add(inc);
+const pharmacies = [];
+const startPurchase = async() => {
+  
+  const runPurchase = async (who) => {
 
+    const numBuy = Math.floor(Math.random() * 2 + 1);
+    const purchasePrice = numBuy * drugPrice;
+  
     const acc = await stdlib.newTestAccount(startingBalance);
 
     acc.setDebugLabel(who);
 
-    await acc.tokenAccept(nftId);
+    await acc.tokenAccept(drugTokenId);
 
-    bidders.push([who, acc]);
+    pharmacies.push([who, acc]);
 
-    const ctc = acc.contract(backend, ctcCreator.getInfo());
+    const ctc = acc.contract(backend, ctcDistributor.getInfo());
     const getBal = async () => stdlib.formatCurrency(await stdlib.balanceOf(acc));
-
-    console.log(`${who} decides to bid ${stdlib.formatCurrency(bid)}.`);
+    
+    console.log(`${who} decides to purchase ${stdlib.formatCurrency(purchasePrice)} ALGO of drug.`);
     console.log(`${who} balance before is ${await getBal()}` );
 
     try {
-      const [ lastBidder, lastBid ] = await ctc.apis.Bidder.bid(bid);
-      console.log(`${who} out bid ${lastBidder} who bid ${stdlib.formatCurrency(lastBid)}`);
+      const [ numSold, lastNumBuy] = await ctc.apis.Pharmacy.purchase(numBuy);
+      console.log(`${who} bought ${lastNumBuy} of drugs that is worth ${stdlib.formatCurrency(purchasePrice)}`);
+      console.log(`Number of sold: ${numSold}`);
     } catch (e) {
-      console.log(`${who} balance after is ${await getBal()}`);
+      
+      console.log(e);
     }
+    console.log(`${who} balance after is ${await getBal()}`);
   };
 
-  await runBidder('Alice');
-  await runBidder('Bob');
-  await runBidder('Claire');
+  await runPurchase('Alice');
+  await runPurchase('Bob');
+  await runPurchase('Claire');
+  await runPurchase('Khooi');
+  await runPurchase('Moh');
 
   while ( ! done ) {
     await stdlib.wait(1);
   }
 };
 
-const ctcCreator = accCreator.contract(backend);
-await ctcCreator.participants.Creator({
-  getSale: () => {
-    console.log('Creator sets parameters of sale:', params);
+const ctcDistributor = accDistributor.contract(backend);
+await ctcDistributor.participants.Distributor({
+  getDrugs: () => {
+    console.log('Distributor sets parameters of sale:', params);
     return params;
   },
-  auctionReady: () => {
-    startBidders();
-  },
-  seeBid: (who, amt) => {
-    console.log(`Creator saw that ${stdlib.formatAddress(who)} bid ${stdlib.formatCurrency(amt)}.`);
-  },
-  showOutcome: (winner, amt) => {
-    console.log(`Creator saw that ${stdlib.formatAddress(winner)} won with ${stdlib.formatCurrency(amt)}`);
+  launched: () => {
+    startPurchase();
   },
 });
 
-for ( const [who, acc] of bidders ) {
-  const [amt, amtNFT] = await stdlib.balancesOf(acc, [null, nftId]);
-  console.log(`${who} has ${stdlib.formatCurrency(amt)} ${stdlib.standardUnit} and ${amtNFT} of the NFT`);
+for ( const [who, acc] of pharmacies ) {
+  const [amt, amtNFT] = await stdlib.balancesOf(acc, [null, drugTokenId]);
+  console.log(`${who} has bought ${stdlib.formatCurrency(amt)} ${stdlib.standardUnit} and ${amtNFT} of the NFT`);
 }
+const getBalDis = stdlib.formatCurrency(await stdlib.balanceOf(accDistributor));
+console.log(`Distributor balance is ${getBalDis()}` );
 
 done = true;
