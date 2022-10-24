@@ -7,7 +7,7 @@ const Drugs = Object({
 
 export const main = Reach.App(() => {
   const Distributor = Participant('Distributor' ,{
-    drugs: Drugs,
+    getDrugs: Fun([], Drugs),
     launched: Fun([Contract], Null),
   })
   const Pharmacy = API('Pharmacy', {
@@ -16,26 +16,28 @@ export const main = Reach.App(() => {
   init()
 
   Distributor.only(() => {
-    const drugs = declassify(interact.drugs)
+    const {price, drugToken} = declassify(interact.getDrugs())
   })
-  Distributor.publish(drugs)
-  const { price, drugToken } = drugs
+  Distributor.publish(price, drugToken)
+  //const { price, drugToken } = drugs
+  const numOfDrugs = 10
   commit()
-  //Distributor.pay([[10, drugToken]])                    // Error 1 here
+  Distributor.pay([[numOfDrugs, drugToken]])                    // Error 1 here
   Distributor.interact.launched(getContract())
   //assert(balance(drugToken) == 10, 'balance is wrong')  // Error 2 here
-  Distributor.publish()
+  //Distributor.publish()
   //const Pharmacys = new Map(Address, Bool)              // track Pharmacy visited by saving their address
   
   const [ numSold, numCust ] = parallelReduce([0, 0])     // 0 sold and 0 Pharmacy at the beginning
     .invariant(balance() == numSold * price)
-    .while(numSold < 10)
+    .invariant(balance(drugToken) == numOfDrugs - numSold)
+    .while(numSold < numOfDrugs)
     .api_(Pharmacy.purchase, (numBuy) => {                // numBuy = number of drugs that the Pharmacy wants to buy
       //check(isNone(Pharmacys[this]), "already registered")
-      check(numBuy < numSold, 'too many')    
+      check(numBuy < numOfDrugs - numSold, 'too many')    
       return[price * numBuy, (ret) => {                   // Pharmacy will pay here
         //Pharmacys[this] = true                          // Save the address of Pharmacy
-        //transfer(numBuy, drugToken).to(this)            // Error 3 here
+        transfer(numBuy, drugToken).to(this)            // Error 3 here
         ret(null)
         return [ numSold+numBuy, numCust+1 ]              // Update number of drugs sold, Update number of Pharmacy visited
       }]
