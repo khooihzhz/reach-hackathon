@@ -8,7 +8,7 @@ const Drugs = Object({
 export const main = Reach.App(() => {
   const Distributor = Participant('Distributor' ,{
     getDrugs: Fun([], Drugs),
-    launched: Fun([Contract], Null),
+    launched: Fun([], Null),
   })
   const Pharmacy = API('Pharmacy', {
     purchase: Fun([UInt], Null),
@@ -23,7 +23,7 @@ export const main = Reach.App(() => {
   const numOfDrugs = 10
   commit()
   Distributor.pay([[numOfDrugs, drugToken]])                    // Error 1 here
-  Distributor.interact.launched(getContract())
+  Distributor.interact.launched()
   //assert(balance(drugToken) == 10, 'balance is wrong')  // Error 2 here
   //Distributor.publish()
   //const Pharmacys = new Map(Address, Bool)              // track Pharmacy visited by saving their address
