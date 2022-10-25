@@ -12,9 +12,7 @@ console.log('Having distributor create drug token');
 
 const drugToken = await stdlib.launchToken(accDistributor, "panadol", "PND", { supply: 10});
 const drugTokenId = drugToken.id;
-const drugPrice = stdlib.parseCurrency(10);  // 2 ALGO
-// const purchaseQuantity = 0;
-// const lenInBlocks = 10;
+const drugPrice = stdlib.parseCurrency(10);  // 10 ALGO per drug
 const params = { drugToken: drugTokenId, price: drugPrice};
 
 let done = false;
@@ -54,8 +52,8 @@ const startPurchase = async() => {
   await runPurchase('Alice');
   await runPurchase('Bob');
   await runPurchase('Claire');
-  await runPurchase('Khooi');
-  await runPurchase('Moh');
+  await runPurchase('Don');
+  await runPurchase('Eva');
 
   while ( ! done ) {
     await stdlib.wait(1);
@@ -75,7 +73,7 @@ await ctcDistributor.participants.Distributor({
 
 for ( const [who, acc] of pharmacies ) {
   const [amt, amtNFT] = await stdlib.balancesOf(acc, [null, drugTokenId]);
-  console.log(`${who} has bought ${stdlib.formatCurrency(amt)} ${stdlib.standardUnit} and ${amtNFT} of the NFT`);
+  console.log(`${who} has bought ${stdlib.formatCurrency(amt)} ${stdlib.standardUnit} and ${amtNFT} of the drug`);
 }
 const getBalDis = stdlib.formatCurrency(await stdlib.balanceOf(accDistributor));
 console.log(`Distributor balance is ${getBalDis()}` );
