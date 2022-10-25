@@ -22,7 +22,7 @@ body {
     width: 747px;
     height: 64px;
     left: 153px;
-    top: 119px;
+    top: 10px;
 
     font-family: 'Poppins';
     font-style: normal;
@@ -58,8 +58,8 @@ body {
     position: relative;
     width: 299px;
     height: 104px;
-    left: 200px;
-    top: 531px;
+    left: 50px;
+    top: 31px;
 
     background: #293FFF;
     border-radius: 20px;
@@ -83,12 +83,12 @@ body {
 }
 
 .DistributorButton{
-    position: relative;
-    top: 270px;
-    left: 400px;
+    position: absolute;
+    top: 500px;
+    left: 300px;
     transform: translate(-50%, -50%);
-    width: 404px;
-    height: 404px;
+    width: 380px;
+    height: 380px;
     text-align: center;
     line-height: 60px;
     color: #fff;
@@ -134,12 +134,12 @@ body {
   }
   
   .PharmacyButton{
-    position: relative;
-    top: 270px;
-    left: 700px;
+    position: absolute;
+    top: 500px;
+    left: 900px;
     transform: translate(-50%, -50%);
-    width: 404px;
-    height: 404px;
+    width: 380px;
+    height: 380px;
     text-align: center;
     line-height: 60px;
     color: #fff;
