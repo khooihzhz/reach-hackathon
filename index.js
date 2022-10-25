@@ -1,20 +1,16 @@
 import React from 'react';
-import LandingPage from './views/LandingPage.js';
 import AppViews from './views/AppViews.js';
 import DistributorViews from './views/DistributorViews.js';
 import PharmacyViews from './views/PharmacyViews.js'
 import {renderDOM, renderView} from './views/render.js';
-import './index.css';
 import * as backend from './build/index.main.mjs';
 import { loadStdlib } from '@reach-sh/stdlib';
-const reach = loadStdlib(process.env);
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
-// const fingerToInt = {'ZERO': 0, 'ONE': 1, 'TWO': 2, 'THREE': 3, 'FOUR': 4, 'FIVE': 5}
-// const guessToInt = {'ZERO': 0, 'ONE': 1, 'TWO': 2, 'THREE': 3, 'FOUR': 4, 'FIVE': 5,
-//                     'SIX': 6, 'SEVEN': 7, 'EIGHT': 8, 'NINE': 9, 'TEN': 10}
-// const intToOutcome = ['Faufau wins!', 'Draw!', 'Paupau wins!']
-// const {standardUnit} = reach;
-// const defaults = {defaultFundAmt: '10', defaultWager: '5', standardUnit};
+const reach = loadStdlib(process.env);
 
 import { ALGO_MyAlgoConnect as MyAlgoConnect } from '@reach-sh/stdlib';
 reach.setWalletFallback(reach.walletFallback({

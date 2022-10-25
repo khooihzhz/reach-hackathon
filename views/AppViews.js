@@ -1,4 +1,6 @@
 import React from 'react';
+import Button from '@mui/material/Button';
+import { Typography } from '@mui/material';
 
 const exports = {};
 
@@ -6,13 +8,12 @@ exports.Wrapper = class extends React.Component {
   render() {
     const {content} = this.props;
     return (
-      <><div className="App">
-        <header className="App-header" id="root">
-          <h1>Drug Counterfeit</h1>
-          {content}
-        </header>
-      </div>
-  </>
+      <>
+        <Typography variant="h4" gutterBottom>
+          Drug Counterfeit  
+        </Typography>
+        {content}
+      </>
     );
   }
 }
@@ -20,13 +21,12 @@ exports.Wrapper = class extends React.Component {
 exports.Landing = class extends React.Component {
   render() {
     return (
-      <div className='Horizontal-line'>
-          <br />_________________________________
-          <br />This website allows user to ....
-
-          <button 
-        className='Start' onClick={() => content.getStarted()}> Get Started </button>
-      </div>
+      <>
+        <Typography variant="subtitle1" gutterBottom>
+          This website allows user to
+        </Typography>
+        <Button variant="contained" onClick={() => content.getStarted()}>Get Started</Button>
+      </>
     )
   }
 }
@@ -36,20 +36,13 @@ exports.DistributorOrPharmacy = class extends React.Component {
     const {parent} = this.props;
     return (
       <div>
-        Please select a role:
-        <br />
-        <p>
-          <button className='DistributorButton'
-            onClick={() => parent.selectDistributor()}
-          >Distributor</button>
-          
-        </p>
-        <p>
-          <button className='PharmacyButton'
-            onClick={() => parent.selectPharmacy()}
-          >Pharmacy</button>
-          
-        </p>
+        <Typography variant="subtitle1" gutterBottom>
+          Please Select a Role :
+        </Typography>
+        <div style={{ display: 'flex', gap: '20px'}}>
+          <Button variant="contained" size="large" onClick={() => parent.selectDistributor()}>Distributor</Button> 
+          <Button variant="outlined" size="large" onClick={() => parent.selectPharmacy()}>Pharmacy</Button> 
+        </div>
       </div>
     );
   }

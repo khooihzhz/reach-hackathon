@@ -1,5 +1,4 @@
 import React from 'react';
-import PlayerViews from './PlayerViews.js';
 
 const exports = {};
 
