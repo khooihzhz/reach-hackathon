@@ -23,23 +23,23 @@ export const main = Reach.App(() => {
   const numOfDrugs = drugSupply;
 
   commit();
-  Distributor.pay([[numOfDrugs, drugToken]])                    // Error 1 here
-  //assert(balance(drugToken) == 10, 'balance is wrong')  // Error 2 here
-  //Distributor.publish()
-  //const Pharmacys = new Map(Address, Bool)              // track Pharmacy visited by saving their address
+  Distributor.pay([[numOfDrugs, drugToken]])                   
+  // ASSERT NUM OF TOKENS
+  assert(balance(drugToken) == numOfDrugs, 'balance is wrong')  
   
-  const [ numSold, numCust ] = parallelReduce([0, 0])     // 0 sold and 0 Pharmacy at the beginning
+  const [ numSold, numCust ] = parallelReduce([0, 0])    
     .invariant(balance() == numSold * price)
     .invariant(balance(drugToken) == numOfDrugs - numSold)
     .while(numSold < numOfDrugs)
     .api_(Pharmacy.purchase, (numBuy) => {                // numBuy = number of drugs that the Pharmacy wants to buy
+      //check(isNone(Pharmacys[this]), "already registered")
       check(numBuy <= numOfDrugs - numSold, 'too many')    
       return[price * numBuy, (ret) => {                   // Pharmacy will pay here
         //Pharmacys[this] = true                          // Save the address of Pharmacy
-        transfer(numBuy, drugToken).to(this)            // Error 3 here
+        transfer(numBuy, drugToken).to(this)
 
-        ret([numSold+numBuy, numBuy])
-        return [ numSold+numBuy, numCust+1 ]              // Update number of drugs sold, Update number of Pharmacy visited
+        ret([numSold + numBuy, numBuy])
+        return [ numSold + numBuy, numCust + 1 ]              // Update number of drugs sold, Update number of Pharmacy visited
       }]
     })
   
