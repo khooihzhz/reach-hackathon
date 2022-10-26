@@ -1,4 +1,6 @@
 import React from 'react';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 const exports = {};
 
@@ -16,17 +18,6 @@ exports.Wrapper = class extends React.Component {
     }
   }
 
-// exports.Distributor = class extends React.Component {
-//   render() {
-//     return (
-//       <div>
-//           halo;
-//       </div>
-      
-//     )
-//   }
-// }
-
 exports.SetParams = class extends React.Component {
   render() {
     const {parent, standardUnit} = this.props;
@@ -36,27 +27,59 @@ exports.SetParams = class extends React.Component {
     const drugSupply = (this.state || {}).drugSupply;
     return (
       <div>
+        <div style={{ marginBottom: '10px'}}>
+          <TextField id="filled-basic" label="Drug Name" variant="filled" 
+          onChange={(e) => this.setState({drugName: e.currentTarget.value})} />
+        </div>
 
-        <label for="drugName">Drug name:</label>
-        <input type="text" id="drugName" name="drugName"
-        onChange={(e) => this.setState({drugName: e.currentTarget.value})}></input>
+        <div style={{ marginBottom: '10px'}}>
+          <TextField id="filled-basic" label="Drug Price" variant="filled" 
+          onChange={(e) => this.setState({drugPrice: e.currentTarget.value})} />
+          {standardUnit}
+        </div>
+
+        <div style={{ marginBottom: '10px'}}>
+          <TextField id="filled-basic" label="Drug Symbol" variant="filled" 
+          onChange={(e) => this.setState({symbol: e.currentTarget.value})} />
+        </div>
+
+        <div style={{ marginBottom: '10px'}}>
+          <TextField id="filled-basic" label="Drug Supply" variant="filled" 
+          onChange={(e) => this.setState({drugSupply: e.currentTarget.value})} />
+        </div>
         
-        <label for="drugPrice">Drug Price:</label>
-        <input type="number" id="drugPrice" name="drugPrice"
-        onChange={(e) => this.setState({drugPrice: e.currentTarget.value})}></input>
-        {standardUnit}
+        <div>
+          <Button variant="contained" 
+            onClick={() => parent.setParams(drugName, symbol, drugSupply, drugPrice)}
+          > Set params </Button>
+        </div>
+      </div>
+    )
+  }
+}
 
-        <label for="symbol">Drug symbol:</label>
-        <input type="text" id="symbol" name="symbol"
-        onChange={(e) => this.setState({symbol: e.currentTarget.value})}></input>
+exports.Deploy = class extends React.Component {
+  render() {
+    const { parent, drugToken, drugPrice } = this.props
 
-        <label for="drugSupply">Drug supply:</label>
-        <input type="number" id="drugSupply" name="drugSupply"
-        onChange={(e) => this.setState({drugSupply: e.currentTarget.value})}></input>
+    return (
+      <div>
+        Params are....
+        {drugToken}
+        {drugPrice}
+        <Button variant="contained" 
+            onClick={() => parent.deploy()}
+          > Deploy Contract </Button>
+      </div>
+    )
+  }
+}
 
-        <button
-        onClick={() => parent.setParams(drugName, symbol, drugSupply, drugPrice)}
-        >Set params</button>
+exports.Deploying = class extends React.Component {
+  render() {
+    return (
+      <div>
+        Deploying.....
       </div>
     )
   }

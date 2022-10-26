@@ -3,12 +3,12 @@
 const Drugs = Object({
   price: UInt,
   drugToken: Token,
+  drugSupply: UInt,
 })
 
 export const main = Reach.App(() => {
   const Distributor = Participant('Distributor' ,{
-    getDrugs: Fun([], Drugs),
-    //launched: Fun([], Null),
+    getParams: Fun([], Drugs),
     showOutcome: Fun([UInt], Null),
   })
   const Pharmacy = API('Pharmacy', {
@@ -17,14 +17,13 @@ export const main = Reach.App(() => {
   init()
 
   Distributor.only(() => {
-    const {price, drugToken} = declassify(interact.getDrugs())
+    const {price, drugToken, drugSupply} = declassify(interact.getParams())
   })
-  Distributor.publish(price, drugToken)
-  //const { price, drugToken } = drugs
-  const numOfDrugs = 10
-  commit()
+  Distributor.publish(price, drugToken, drugSupply)
+  const numOfDrugs = drugSupply;
+
+  commit();
   Distributor.pay([[numOfDrugs, drugToken]])                    // Error 1 here
-  //Distributor.interact.launched()
   //assert(balance(drugToken) == 10, 'balance is wrong')  // Error 2 here
   //Distributor.publish()
   //const Pharmacys = new Map(Address, Bool)              // track Pharmacy visited by saving their address
@@ -34,7 +33,6 @@ export const main = Reach.App(() => {
     .invariant(balance(drugToken) == numOfDrugs - numSold)
     .while(numSold < numOfDrugs)
     .api_(Pharmacy.purchase, (numBuy) => {                // numBuy = number of drugs that the Pharmacy wants to buy
-      //check(isNone(Pharmacys[this]), "already registered")
       check(numBuy <= numOfDrugs - numSold, 'too many')    
       return[price * numBuy, (ret) => {                   // Pharmacy will pay here
         //Pharmacys[this] = true                          // Save the address of Pharmacy

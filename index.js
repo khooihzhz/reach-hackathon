@@ -50,26 +50,22 @@ class Distributor extends React.Component {
     super(props);
     this.state = {view: 'SetParams'};
   }
-  async getDrugs() { // Fun([], Drugs)
-    const params = await new Promise(resolveParams => {
-      this.setState({view: 'GetParams', resolveParams});
-    });
-    this.setState({view: 'WaitingForPharmacy', params});
-    return params;
+  getParams() { // Fun([], Drugs)
+    console.log(`drug supply is ${this.state.drugSupply}\n drug Token : ${this.state.drugToken}`)
+    return {price: this.state.drugPrice, drugToken: this.state.drugTokenId, drugSupply: this.state.supply}
   }
+
   async deploy() {
     const ctc = this.props.acc.contract(backend);
     this.setState({view: 'Deploying', ctc});
-    this.wager = reach.parseCurrency(this.state.wager); // UInt
-    this.deadline = {ETH: 10, ALGO: 100, CFX: 1000}[reach.connector]; // UInt
     backend.Distributor(ctc, this);
     const ctcInfoStr = JSON.stringify(await ctc.getInfo(), null, 2);
     this.setState({view: 'DrugDetails', ctcInfoStr});
   }
-  setParams(drugName, symbol, drugSupply, price) { 
-    const drugToken = reach.launchToken(this.state.acc, drugName, symbol, {supply: drugSupply})
-    this.setState({params: {drugToken: drugToken.id, price: price}})
-    this.deploy() 
+
+  async setParams(drugName, symbol, drugSupply, price) { 
+    const drugToken = await reach.launchToken(this.props.acc, drugName, symbol, {supply: drugSupply})
+    this.setState({view: 'Deploy', drugTokenId: drugToken.id, drugPrice: price, supply: drugSupply})
   }
   render() { return renderView(this, DistributorViews); 
 
