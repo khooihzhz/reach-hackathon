@@ -64,9 +64,6 @@ exports.Deploy = class extends React.Component {
 
     return (
       <div>
-        Params are....
-        {drugToken}
-        {drugPrice}
         <Button variant="contained" 
             onClick={() => parent.deploy()}
           > Deploy Contract </Button>

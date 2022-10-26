@@ -74,24 +74,35 @@ class Distributor extends React.Component {
 class Pharmacy extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {view: 'Pharmacy'};
+    this.state = {view: 'Attach'};
   }
   attach(ctcInfoStr) {
     const ctc = this.props.acc.contract(backend, JSON.parse(ctcInfoStr));
-    this.setState({view: 'Attaching'});
-    backend.Distributor(ctc, this);
+    this.setState({view: 'Attaching', ctc});
+    backend.Pharmacies(ctc, this);
   }
-  async acceptWager(wagerAtomic) { // Fun([UInt], Null)
-    const wager = reach.formatCurrency(wagerAtomic, 4);
+  async optIn(Drugs) { // Fun([UInt], Null)
+    const {drugToken, price} = Drugs;
+    const drugPrice = parseInt(price)
+    const id = reach.bigNumberToNumber(drugToken) //accept token
+    await this.props.acc.tokenAccept(id)
+    const supply = await this.state.ctc.apis.Pharmacy.getSupply();
+    console.log(drugPrice, supply, drugToken)
+    const drugSupply = parseInt(supply);
     return await new Promise(resolveAcceptedP => {
-      this.setState({view: 'AcceptTerms', wager, resolveAcceptedP});
+      this.setState({view: 'AcceptTerms', drugSupply, price: drugPrice, resolveAcceptedP});
     });
   }
   termsAccepted() {
     this.state.resolveAcceptedP();
-    this.setState({view: 'WaitingForTurn'});
+    this.setState({view: 'Market'});
   }
-  render() { return renderView(this, AttacherViews); }
+  async buyDrug(numDrugsToBuy) {
+    const [totalNumSold, numBuy, currentSupply] = await this.state.ctc.apis.Pharmacy.purchase(numDrugsToBuy);
+    this.setState({drugSupply: parseInt(currentSupply)});
+    console.log(parseInt(currentSupply));
+  }
+  render() { return renderView(this, PharmacyViews); }
 }
 
 renderDOM(<App />);
