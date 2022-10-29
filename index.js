@@ -19,11 +19,11 @@ reach.setWalletFallback(reach.walletFallback({
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {view: 'Landing'};
+    this.state = {view: 'Landing'}
+    //this.state = {view: 'Wrapper', ContentView: Pharmacy}; // Chage back to landing later
   }
-  getStarted() {
-    this.setState({view: 'DistributorOrPharmacy'})
-  }
+
+  
   async componentDidMount() {
     const acc = await reach.getDefaultAccount();
     const balAtomic = await reach.balanceOf(acc);
@@ -52,7 +52,7 @@ class Distributor extends React.Component {
   }
   getParams() { // Fun([], Drugs)
     console.log(`drug supply is ${this.state.drugSupply}\n drug Token : ${this.state.drugToken}`)
-    return {price: this.state.drugPrice, drugToken: this.state.drugTokenId, drugSupply: this.state.supply}
+    return {price: reach.parseCurrency(this.state.drugPrice), drugToken: this.state.drugTokenId, drugSupply: this.state.supply}
   }
 
   async deploy() {
@@ -64,6 +64,7 @@ class Distributor extends React.Component {
   }
 
   async setParams(drugName, symbol, drugSupply, price) { 
+    this.setState({view: 'SettingParams'})
     const drugToken = await reach.launchToken(this.props.acc, drugName, symbol, {supply: drugSupply})
     this.setState({view: 'Deploy', drugTokenId: drugToken.id, drugPrice: price, supply: drugSupply})
   }
@@ -83,23 +84,25 @@ class Pharmacy extends React.Component {
   }
   async optIn(Drugs) { // Fun([UInt], Null)
     const {drugToken, price} = Drugs;
-    const drugPrice = parseInt(price)
-    const id = reach.bigNumberToNumber(drugToken) //accept token
+    const drugPrice = reach.formatCurrency(price)
+    const id = reach.bigNumberToNumber(drugToken) 
     await this.props.acc.tokenAccept(id)
     const supply = await this.state.ctc.apis.Pharmacy.getSupply();
-    console.log(drugPrice, supply, drugToken)
+    const drugMetadata = await this.props.acc.tokenMetadata(id)
     const drugSupply = parseInt(supply);
     return await new Promise(resolveAcceptedP => {
-      this.setState({view: 'AcceptTerms', drugSupply, price: drugPrice, resolveAcceptedP});
+      this.setState({view: 'AcceptTerms', drugName: drugMetadata.name, drugSupply, price: drugPrice, resolveAcceptedP});
     });
   }
-  termsAccepted() {
+  termsAccepted(drugName, price, drugSupply) {
+    this.setState({view: 'AcceptingTerms'})
     this.state.resolveAcceptedP();
-    this.setState({view: 'Market'});
+    this.setState({view: 'Market', drugName, price, drugSupply});
   }
   async buyDrug(numDrugsToBuy) {
+    this.setState({view: 'Processing'})
     const [totalNumSold, numBuy, currentSupply] = await this.state.ctc.apis.Pharmacy.purchase(numDrugsToBuy);
-    this.setState({drugSupply: parseInt(currentSupply)});
+    this.setState({drugSupply: currentSupply});
     console.log(parseInt(currentSupply));
   }
   render() { return renderView(this, PharmacyViews); }

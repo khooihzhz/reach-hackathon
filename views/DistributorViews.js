@@ -1,6 +1,14 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { Typography } from '@mui/material';
+import StoreIcon from '@mui/icons-material/Store';
+import { ThreeDots } from 'react-loader-spinner';
+
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
 const exports = {};
 
@@ -8,10 +16,13 @@ exports.Wrapper = class extends React.Component {
     render() {
       const {content} = this.props;
       return (
-        <div className="Distributor">
-          <h1>
-            Distributor
-          </h1>
+        <div>
+          <div style={{ display: 'flex', gap: '20px', verticalAlign: 'center', justifyContent: 'center'}}>
+            <StoreIcon fontSize='large' mt={2}/>
+            <Typography variant="h4" component="div" sx={{ flexGrow: 1 }} mb={3}>
+              Distributor
+            </Typography>
+          </div>
           {content}
         </div>
       );
@@ -26,29 +37,28 @@ exports.SetParams = class extends React.Component {
     const symbol = (this.state || {}).symbol;
     const drugSupply = (this.state || {}).drugSupply;
     return (
-      <div>
-        <div style={{ marginBottom: '10px'}}>
-          <TextField id="filled-basic" label="Drug Name" variant="filled" 
+      <div style={{ margiinBottom: '25px'}}>
+        <div style={{ marginBottom: '20px'}}>
+          <TextField id="outlined-basic" label="Drug Name" variant="outlined" 
           onChange={(e) => this.setState({drugName: e.currentTarget.value})} />
         </div>
 
-        <div style={{ marginBottom: '10px'}}>
-          <TextField id="filled-basic" label="Drug Price" variant="filled" 
-          onChange={(e) => this.setState({drugPrice: e.currentTarget.value})} />
-          {standardUnit}
-        </div>
-
-        <div style={{ marginBottom: '10px'}}>
-          <TextField id="filled-basic" label="Drug Symbol" variant="filled" 
+        <div style={{ marginBottom: '20px'}}>
+          <TextField id="outlined-basic" label="Drug Symbol" variant="outlined" 
           onChange={(e) => this.setState({symbol: e.currentTarget.value})} />
         </div>
 
-        <div style={{ marginBottom: '10px'}}>
-          <TextField id="filled-basic" label="Drug Supply" variant="filled" 
+        <div style={{ marginBottom: '20px'}}>
+          <TextField id="outlined-basic" label="Drug Price" variant="outlined" 
+          onChange={(e) => this.setState({drugPrice: e.currentTarget.value})} />
+        </div>
+
+        <div style={{ marginBottom: '20px'}}>
+          <TextField id="outlined-basic" label="Drug Supply" variant="outlined" 
           onChange={(e) => this.setState({drugSupply: e.currentTarget.value})} />
         </div>
         
-        <div>
+        <div style={{ display: 'flex', justifyContent: 'center'}}>
           <Button variant="contained" 
             onClick={() => parent.setParams(drugName, symbol, drugSupply, drugPrice)}
           > Set params </Button>
@@ -58,15 +68,44 @@ exports.SetParams = class extends React.Component {
   }
 }
 
+exports.SettingParams = class extends React.Component {
+  render() {
+    return (
+      <div>
+        <Typography variant="h5" component="div" sx={{ flexGrow: 1, textAlign: 'center' }} mt={3}>
+          Setting Params
+        </Typography>
+       
+       <div style={{ display: 'flex', justifyContent: 'center'}}>
+        <ThreeDots 
+          height="80" 
+          width="100" 
+          radius="9"
+          color="black" 
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClassName=""
+          visible={true}
+          />
+       </div>
+      </div>
+    )
+  }
+}
+
 exports.Deploy = class extends React.Component {
   render() {
     const { parent, drugToken, drugPrice } = this.props
-
     return (
       <div>
-        <Button variant="contained" 
-            onClick={() => parent.deploy()}
-          > Deploy Contract </Button>
+        <Typography variant="subtitle1" component="div" sx={{ flexGrow: 1, textAlign: 'center' }} mt={3} mb={2}>
+          Deploy Contract to Blockchain
+        </Typography>
+        <div style={{ display:'flex', justifyContent: 'center'}}>
+          <Button variant="contained" 
+              onClick={() => parent.deploy()}
+            > Deploy Contract </Button>
+        </div>
       </div>
     )
   }
@@ -76,7 +115,22 @@ exports.Deploying = class extends React.Component {
   render() {
     return (
       <div>
-        Deploying.....
+        <Typography variant="h5" component="div" sx={{ flexGrow: 1, textAlign: 'center' }} mt={3}>
+          Deploying
+        </Typography>
+       
+       <div style={{ display: 'flex', justifyContent: 'center'}}>
+        <ThreeDots 
+          height="80" 
+          width="100" 
+          radius="9"
+          color="black" 
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClassName=""
+          visible={true}
+          />
+       </div>
       </div>
     )
   }
@@ -87,7 +141,12 @@ exports.DrugDetails = class extends React.Component {
     const {ctcInfoStr} = this.props;
     return (
       <div>
-        {ctcInfoStr}
+        <Typography variant="h5" component="div" sx={{ flexGrow: 1, textAlign: 'center' }} mt={3} mb={2}>
+          Contract Info
+        </Typography>
+        <div style={{ textAlign: 'center'}}>
+          {ctcInfoStr}
+        </div>
       </div>
     )
   }
