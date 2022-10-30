@@ -20,7 +20,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {view: 'Landing'}
-    //this.state = {view: 'Wrapper', ContentView: Pharmacy}; // Chage back to landing later
+    //this.state = {view: 'Wrapper', ContentView: Distributor}; // Chage back to landing later
   }
 
   

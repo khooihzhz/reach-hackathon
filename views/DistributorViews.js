@@ -9,6 +9,13 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 const exports = {};
 
@@ -154,13 +161,38 @@ exports.DrugDetails = class extends React.Component {
     const apiUrl = axios.create({baseURL: "https://algoindexer.testnet.algoexplorerapi.io/v2/accounts"})
 
     console.log("hey im running this interval")
-    apiUrl.get(`/${this.props.ctcAddress}/transactions`).then(
+    apiUrl.get(`/${this.props.ctcAddress}/transactions?tx-type=axfer`).then(
       res => {
         console.log(res.data)
-        this.setState({transHistory: res.data})
+        this.setState({transHistory: res.data.transactions})
       }
     )
   }
+
+  renderData(transHistory){
+    let txn_id = []
+    let amount = []
+    if (transHistory === undefined)
+    {
+      return {amount, txn_id}
+    }
+    for(let i = 0; i < transHistory.length; i++)
+    {
+      console.log(transHistory[i]);
+      if (transHistory[i]["inner-txns"] === undefined){
+        continue;
+      }
+      else if (transHistory[i]["inner-txns"][0]["asset-transfer-transaction"]["amount"] == 0){
+        continue;
+      }
+      else{
+        amount.push(transHistory[i]["inner-txns"][0]["asset-transfer-transaction"]["amount"])
+        txn_id.push(transHistory[i]["inner-txns"][0]["asset-transfer-transaction"]["receiver"])
+      }
+    }
+    return {amount, txn_id}
+  }
+
   componentWillUnmount(){
     clearInterval(this.interval);
   }
@@ -168,20 +200,46 @@ exports.DrugDetails = class extends React.Component {
   render() {
     const {ctcInfoStr, ctcAddress} = this.props;
     const transHistory = (this.state || {}).transHistory;
+
+    //const amount = ["19", "222", "111", "0", "123"]
+    //const txn_id = ["I74OBW4ZBWT4JDESARMSIPJGFITNBFFGAYTJD2P6UAOLVUBKDQWTFKKG6A", "2Z6SCCKHUTVEH6CYDBJZJVERSW3UDTEQD2OH6XC6HK4ZKSJM6LYWWRJ6VM", "2Z6SCCKHUTVEH6CYDBJZJVERSW3UDTEQD2OH6XC6HK4ZKSJM6LYWWRJ6VM", "2Z6SCCKHUTVEH6CYDBJZJVERSW3UDTEQD2OH6XC6HK4ZKSJM6LYWWRJ6VM", "I74OBW4ZBWT4JDESARMSIPJGFITNBFFGAYTJD2P6UAOLVUBKDQWTFKKG6A"]
+    const {amount, txn_id} = this.renderData(transHistory)
     
     return (
       <div>
         <Typography variant="h5" component="div" sx={{ flexGrow: 1, textAlign: 'center' }} mt={3} mb={2}>
           Contract Info
         </Typography>
-        <div style={{ textAlign: 'center'}}>
+        <div style={{ textAlign: 'center', marginBottom: '20px'}}>
           {ctcInfoStr}
         </div>
-        <div>
-          {JSON.stringify(transHistory)}
-        </div>
+        
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell align="left">Pharmacy Address</TableCell>
+                <TableCell align="right">Purchase Amount</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {txn_id.map((id, index) => (
+                <TableRow
+                  key={index}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {txn_id[index]}
+                  </TableCell>
+                  <TableCell align="right">{amount[index]}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+
       </div>
-      // address, balance paid, num bought
     )
   }
 }
