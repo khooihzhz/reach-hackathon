@@ -142,14 +142,27 @@ exports.DrugDetails = class extends React.Component {
   }
 
   componentDidMount(){
+    this.callApi();
+    console.log("hello im here")
+    this.interval = setInterval(() => {
+      console.log("hello im there")
+      this.callApi()
+    }, 5000)
+  }
+
+  callApi(){
     const apiUrl = axios.create({baseURL: "https://algoindexer.testnet.algoexplorerapi.io/v2/accounts"})
 
+    console.log("hey im running this interval")
     apiUrl.get(`/${this.props.ctcAddress}/transactions`).then(
       res => {
         console.log(res.data)
         this.setState({transHistory: res.data})
       }
     )
+  }
+  componentWillUnmount(){
+    clearInterval(this.interval);
   }
 
   render() {

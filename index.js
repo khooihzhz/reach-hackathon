@@ -33,8 +33,9 @@ class App extends React.Component {
       this.setState({view: 'FundAccount'});
     } else {
       this.setState({view: 'DistributorOrPharmacy'});
-    }
+    }    
   }
+  
   async fundAccount(fundAmount) {
     await reach.fundFromFaucet(this.state.acc, reach.parseCurrency(fundAmount));
     this.setState({view: 'DistributorOrPharmacy'});
