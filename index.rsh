@@ -20,7 +20,7 @@ export const main = Reach.App(() => {
     optIn: Fun([Drugs], Null), 
   })
 
-  init()
+  init();
 
   Distributor.only(() => {
     const {price, drugToken, drugSupply} = declassify(interact.getParams())

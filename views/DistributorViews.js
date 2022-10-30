@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import { Typography } from '@mui/material';
 import StoreIcon from '@mui/icons-material/Store';
 import { ThreeDots } from 'react-loader-spinner';
-
+import axios from 'axios'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -137,8 +137,25 @@ exports.Deploying = class extends React.Component {
 }
 
 exports.DrugDetails = class extends React.Component {
+  constructor(props){
+    super(props);
+  }
+
+  componentDidMount(){
+    const apiUrl = axios.create({baseURL: "https://algoindexer.testnet.algoexplorerapi.io/v2/accounts"})
+
+    apiUrl.get(`/${this.props.ctcAddress}/transactions`).then(
+      res => {
+        console.log(res.data)
+        this.setState({transHistory: res.data})
+      }
+    )
+  }
+
   render() {
-    const {ctcInfoStr} = this.props;
+    const {ctcInfoStr, ctcAddress} = this.props;
+    const transHistory = (this.state || {}).transHistory;
+    
     return (
       <div>
         <Typography variant="h5" component="div" sx={{ flexGrow: 1, textAlign: 'center' }} mt={3} mb={2}>
@@ -147,7 +164,11 @@ exports.DrugDetails = class extends React.Component {
         <div style={{ textAlign: 'center'}}>
           {ctcInfoStr}
         </div>
+        <div>
+          {JSON.stringify(transHistory)}
+        </div>
       </div>
+      // address, balance paid, num bought
     )
   }
 }

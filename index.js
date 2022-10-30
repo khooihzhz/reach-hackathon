@@ -60,7 +60,9 @@ class Distributor extends React.Component {
     this.setState({view: 'Deploying', ctc});
     backend.Distributor(ctc, this);
     const ctcInfoStr = JSON.stringify(await ctc.getInfo(), null, 2);
-    this.setState({view: 'DrugDetails', ctcInfoStr});
+    const ctcAddressAwait = await ctc.getContractAddress();
+    console.log(`address is ${reach.formatAddress(ctcAddressAwait)}`)
+    this.setState({view: 'DrugDetails', ctcInfoStr, ctcAddress: reach.formatAddress(ctcAddressAwait)});
   }
 
   async setParams(drugName, symbol, drugSupply, price) { 
@@ -104,6 +106,7 @@ class Pharmacy extends React.Component {
     const [totalNumSold, numBuy, currentSupply] = await this.state.ctc.apis.Pharmacy.purchase(numDrugsToBuy);
     this.setState({drugSupply: currentSupply});
     console.log(parseInt(currentSupply));
+    this.setState({view: 'TransactionSuccess'})
   }
   render() { return renderView(this, PharmacyViews); }
 }

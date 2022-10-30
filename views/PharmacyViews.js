@@ -192,7 +192,7 @@ exports.TransactionSuccess = class extends React.Component {
     return (
       <div>
         <Typography variant="h5" component="div" sx={{ flexGrow: 1, textAlign: 'center' }} mt={3} mb={2}>
-          Click on the link below to check your trnsaction:
+          Click on the link below to check your transaction:
         </Typography>
         <div style={{ textAlign: 'center'}}>
           
