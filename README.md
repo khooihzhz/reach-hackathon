@@ -1,5 +1,5 @@
 # reach-malaysia-uni-hackathon
-This project is used on the Reach Malaysia Uni Hackathon
+This project is used on the Reach Malaysia Uni Hackathon for Team #07
 
 ## Project Description
 This project demonstrate the use of blockchain in drug supply chains. 
