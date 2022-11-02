@@ -44,5 +44,3 @@ yarn install
 # To run locally,
 ../reach react
 ```
-
-## Credits
