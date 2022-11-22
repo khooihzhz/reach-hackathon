@@ -46,12 +46,12 @@ exports.SetParams = class extends React.Component {
     return (
       <div style={{ margiinBottom: '25px'}}>
         <div style={{ marginBottom: '20px'}}>
-          <TextField id="outlined-basic" label="Drug Name" variant="outlined" 
+          <TextField id="outlined-basic" label="Drug Name" variant="outlined" value="Panadol"
           onChange={(e) => this.setState({drugName: e.currentTarget.value})} />
         </div>
 
         <div style={{ marginBottom: '20px'}}>
-          <TextField id="outlined-basic" label="Drug Symbol" variant="outlined" 
+          <TextField id="outlined-basic" label="Drug Symbol" variant="outlined"  value="PND"
           onChange={(e) => this.setState({symbol: e.currentTarget.value})} />
         </div>
 
@@ -198,6 +198,12 @@ exports.DrugDetails = class extends React.Component {
     const {ctcInfoStr, ctcAddress} = this.props;
     const transHistory = (this.state || {}).transHistory;
 
+    function copyToClipboard(button) {
+      navigator.clipboard.writeText(ctcInfoStr);
+      const origInnerHTML = button.innerHTML;
+      button.innerHTML = 'Copied!';
+    }
+
     //const amount = ["19", "222", "111", "0", "123"]
     //const txn_id = ["I74OBW4ZBWT4JDESARMSIPJGFITNBFFGAYTJD2P6UAOLVUBKDQWTFKKG6A", "2Z6SCCKHUTVEH6CYDBJZJVERSW3UDTEQD2OH6XC6HK4ZKSJM6LYWWRJ6VM", "2Z6SCCKHUTVEH6CYDBJZJVERSW3UDTEQD2OH6XC6HK4ZKSJM6LYWWRJ6VM", "2Z6SCCKHUTVEH6CYDBJZJVERSW3UDTEQD2OH6XC6HK4ZKSJM6LYWWRJ6VM", "I74OBW4ZBWT4JDESARMSIPJGFITNBFFGAYTJD2P6UAOLVUBKDQWTFKKG6A"]
     const {amount, txn_id} = this.renderData(transHistory)
@@ -210,6 +216,13 @@ exports.DrugDetails = class extends React.Component {
         <div style={{ textAlign: 'center', marginBottom: '20px'}}>
           {ctcInfoStr}
         </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: "20px"}}>
+          <Button variant="contained" 
+            onClick={(e) => copyToClipboard(e.currentTarget)}
+          > Copy to clipboard </Button>
+        </div>
+
         
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
